@@ -7,6 +7,7 @@
 //************************************************************//
 #include "texture.h"
 #include "figuras.h"
+#include "Camera.h"
 #include <ctime>
 
 float pos_camX = 0, pos_camY = 0, pos_camZ = -5; 
@@ -20,7 +21,9 @@ GLfloat Specular[] = { 1.0, 1.0, 1.0, 1.0 };				// Specular Light Values
 GLfloat Position[]= { 0.0f, 3.0f, 0.0f, 1.0f };				// Light Position
 GLfloat Position2[]= { 0.0f, -5.0f, 0.0f, 1.0f };			// Light Position
 
-void * font = GLUT_BITMAP_TIMES_ROMAN_24;
+//	Cámara para ver el tablero desde fuera
+float g_lookupdown = 0.0f;
+CCamera camaraUsuario;
 
 
 //	Objeto para realizar figuras
@@ -28,7 +31,7 @@ CFiguras figures;
 
 //	Texturas
 CTexture fondo;
-CTexture puerta;
+CTexture pared;
 CTexture ventana;
 
 void InitGL ( GLvoid )     // Inicializamos parametros
@@ -49,17 +52,20 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 
 	//	Procesar imagenes
 
-	fondo.LoadTGA("fondo.tga");
+	fondo.LoadTGA("textures/darksels2.tga");
 	fondo.BuildGLTexture();
 	fondo.ReleaseImage();
 
-	ventana.LoadTGA("vidrio.tga");
+	ventana.LoadTGA("textures/vidrio2.tga");
 	ventana.BuildGLTexture();
 	ventana.ReleaseImage();
 
-	puerta.LoadTGA("logo.tga");
-	puerta.BuildGLTexture();
-	puerta.ReleaseImage();
+	pared.LoadTGA("textures/darksels.tga");
+	pared.BuildGLTexture();
+	pared.ReleaseImage();
+
+	//	Posición Cámara
+	camaraUsuario.Position_Camera(0, 0, 30, 0, 0, 27, 0, 1, 0);
 }
 
 
@@ -75,102 +81,16 @@ void renderBitmapCharacter(float x, float y, float z, void *font,char *string)
   }
 }
 
-
-
-/*void prisma(GLuint textura, GLuint textura2, GLuint textura3)  //Funcion creacion prisma
+void cajaPachinko()
 {
+	glPushMatrix();
+	figures.prisma4(30, 30, 6, fondo.GLindex, pared.GLindex, ventana.GLindex);
 
-	GLfloat vertice[8][3] = 
-	{
-		{ 0.5 ,-0.5, 0.5 },		//	Coordenadas Vértice 0 V0
-		{ -0.5 ,-0.5, 0.5 },    //	Coordenadas Vértice 1 V1
-		{ -0.5 ,-0.5, -0.5 },   //	Coordenadas Vértice 2 V2
-		{ 0.5 ,-0.5, -0.5 },    //	Coordenadas Vértice 3 V3
-		{ 0.5 ,0.5, 0.5 },		//	Coordenadas Vértice 4 V4
-		{ 0.5 ,0.5, -0.5 },		//	Coordenadas Vértice 5 V5
-		{ -0.5 ,0.5, -0.5 },    //	Coordenadas Vértice 6 V6
-		{ -0.5 ,0.5, 0.5 },		//	Coordenadas Vértice 7 V7
-	};
+	glPushMatrix();
+	glPopMatrix();
 
-
-	glBindTexture(GL_TEXTURE_2D, textura);   // choose the texture to use.
-
-	glBegin(GL_POLYGON);	//Back
-							//glColor3f(0.0,1.0,0.0);
-	glNormal3f(0.0f, 0.0f, -1.0f);
-	glTexCoord2f(0, 1); glVertex3fv(vertice[6]);
-	glTexCoord2f(1, 1); glVertex3fv(vertice[5]);
-	glTexCoord2f(1, 0); glVertex3fv(vertice[3]);
-	glTexCoord2f(0, 0); glVertex3fv(vertice[2]);
-	glEnd();
-
-
-	
-	glBindTexture(GL_TEXTURE_2D, textura3);   // choose the texture to use.
-
-	glBegin(GL_POLYGON);	//Right
-							//glColor3f(0.0,0.0,1.0);
-	glNormal3f(1.0f, 0.0f, 0.0f);
-	glTexCoord2f(1, 1); glVertex3fv(vertice[0]);
-	glTexCoord2f(1, 0); glVertex3fv(vertice[3]);
-	glTexCoord2f(0, 0); glVertex3fv(vertice[5]);
-	glTexCoord2f(0, 1); glVertex3fv(vertice[4]);
-	glEnd();
-
-	
-	glBegin(GL_POLYGON);  //Bottom
-						  //glColor3f(0.4,0.2,0.6);
-	glNormal3f(0.0f, -1.0f, 0.0f);
-	glTexCoord2f(1, 0); glVertex3fv(vertice[0]);
-	glTexCoord2f(0, 0); glVertex3fv(vertice[1]);
-	glTexCoord2f(0, 1); glVertex3fv(vertice[2]);
-	glTexCoord2f(1, 1); glVertex3fv(vertice[3]);
-	glEnd();
-
-	glBegin(GL_POLYGON);  //Left
-						  //glColor3f(1.0,1.0,1.0);
-	glNormal3f(-1.0f, 0.0f, 0.0f);
-	glTexCoord2f(1, 0); glVertex3fv(vertice[1]);
-	glTexCoord2f(0, 0); glVertex3fv(vertice[7]);
-	glTexCoord2f(0, 1); glVertex3fv(vertice[6]);
-	glTexCoord2f(1, 1); glVertex3fv(vertice[2]);
-	glEnd();
-
-	
-
-
-	glBegin(GL_POLYGON);  //Top
-						  //glColor3f(0.8,0.2,0.4);
-	glColor3f(1.0, 1.0, 1.0);
-	glNormal3f(0.0f, 1.0f, 0.0f);
-	glTexCoord2f(1, 1); glVertex3fv(vertice[4]);
-	glTexCoord2f(1, 0); glVertex3fv(vertice[5]);
-	glTexCoord2f(0, 0); glVertex3fv(vertice[6]);
-	glTexCoord2f(0, 1); glVertex3fv(vertice[7]);
-	glEnd();
-
-
-	glBindTexture(GL_TEXTURE_2D, textura2);
-	glEnable(GL_ALPHA_TEST);
-	glAlphaFunc(GL_GREATER, 0.1);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	glBegin(GL_POLYGON);	
-	
-	//Front
-							//glColor3f(0.0,0.0,1.0);
-	glNormal3f(0.0f, 0.0f, 1.0f);
-	glTexCoord2f(1, 0); glVertex3fv(vertice[0]);
-	glTexCoord2f(1, 1); glVertex3fv(vertice[4]);
-	glTexCoord2f(0, 1); glVertex3fv(vertice[7]);
-	glTexCoord2f(0, 0); glVertex3fv(vertice[1]);
-	glEnd();
-
-	glDisable(GL_ALPHA_TEST);
-	glDisable(GL_BLEND);
-
-}*/
+	glPopMatrix();
+}
 
 void display ( void )   // Creamos la funcion donde se dibuja
 {
@@ -178,22 +98,17 @@ void display ( void )   // Creamos la funcion donde se dibuja
 	
 	glLoadIdentity();
 
-	glPushMatrix();
-		glTranslatef(pos_camX, pos_camY, pos_camZ);
-		glRotatef(eye_camX, 1.0, 0.0, 0.0);
-		glRotatef(eye_camY, 0.0, 1.0, 0.0);
-		glRotatef(eye_camZ, 0.0, 0.0, 1.0);
+	glPushMatrix();	//	1
 
-		glPushMatrix();
-		//glScalef(4.5, 3.5, 3);
-		figures.prisma4(4.5, 3.5, 3, fondo.GLindex, puerta.GLindex, ventana.GLindex);
-		glPopMatrix();
+	glRotatef(g_lookupdown, 1, 0, 0);
+	gluLookAt(camaraUsuario.mPos.x, camaraUsuario.mPos.y, camaraUsuario.mPos.z,
+		camaraUsuario.mView.x, camaraUsuario.mView.y, camaraUsuario.mView.z,
+		camaraUsuario.mUp.x, camaraUsuario.mUp.y, camaraUsuario.mUp.z);
+		
+		cajaPachinko();
 
-	glPopMatrix();
+	glPopMatrix();	//	1
 
-	glDisable(GL_TEXTURE_2D);
-		renderBitmapCharacter(-11, 12.0, -14.0, (void *)font, "Prakti k eit");
-		renderBitmapCharacter(-11, 10.5, -14, (void *)font, "ksa :v");
 	glEnable(GL_TEXTURE_2D);
 
 	glutSwapBuffers ( );
@@ -237,24 +152,24 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 	switch ( key ) {
 		case 'w':   //Movimientos de camara
 		case 'W':
-			pos_camZ += 0.5f;
+			camaraUsuario.Move_Camera(CAMERASPEED + 0.2);
 			//eye_camZ -= 0.5f;
 			break;
 
 		case 's':
 		case 'S':
-			pos_camZ -= 0.5f;
+			camaraUsuario.Move_Camera(-(CAMERASPEED + 0.2));
 			//eye_camZ += 0.5f;
 			break;
 
 		case 'a':
 		case 'A':
-			pos_camX += 0.5f;
+			camaraUsuario.Strafe_Camera(-(CAMERASPEED + 0.4));
 			//eye_camX -= 0.5f;
 			break;
 		case 'd':
 		case 'D':
-			pos_camX -= 0.5f;
+			camaraUsuario.Strafe_Camera(CAMERASPEED + 0.4);
 			//eye_camX += 0.5f;
 			break;
 
@@ -271,29 +186,29 @@ void arrow_keys ( int a_keys, int x, int y )  // Funcion para manejo de teclas e
 {
   switch ( a_keys ) {
 	case GLUT_KEY_PAGE_UP:
-		pos_camY -= 0.5f;
+		camaraUsuario.UpDown_Camera(CAMERASPEED);
 		//eye_camY += 0.5f;
 		break;
 
 	case GLUT_KEY_PAGE_DOWN:
-		pos_camY += 0.5f;
+		camaraUsuario.UpDown_Camera(-CAMERASPEED);
 		//eye_camY -= 0.5f;
 		break;
 
     case GLUT_KEY_UP:     // Presionamos tecla ARRIBA...
-		eye_camX = (eye_camX-15) % 360;
+		g_lookupdown -= 1.0f;
 		break;
 
     case GLUT_KEY_DOWN:               // Presionamos tecla ABAJO...
-		eye_camX = (eye_camX+15) % 360;
+		g_lookupdown += 1.0f;
 		break;
 
 	case GLUT_KEY_LEFT:
-		eye_camY = (eye_camY-15) % 360;
+		camaraUsuario.Rotate_View(-CAMERASPEED);
 		break;
 
 	case GLUT_KEY_RIGHT:
-		eye_camY = (eye_camY+15) % 360;
+		camaraUsuario.Rotate_View(CAMERASPEED);
 		break;
     default:
       break;
