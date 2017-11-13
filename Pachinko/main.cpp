@@ -8,6 +8,7 @@
 #include "texture.h"
 #include "figuras.h"
 #include "Camera.h"
+#include "cmodel\CModel.h"
 #include <ctime>
 
 float pos_camX = 0, pos_camY = 0, pos_camZ = -5; 
@@ -16,11 +17,11 @@ int eye_camX = 0, eye_camY = 0.0, eye_camZ = 0;
 float text_der = 1.0;
 float text_izq = 0.0;
 
-GLfloat Diffuse[]= { 0.5f, 0.5f, 0.5f, 1.0f };				// Diffuse Light Values
-GLfloat Specular[] = { 1.0, 1.0, 1.0, 1.0 };				// Specular Light Values
-//GLfloat Position[]= { -30, 30, 0, 1.0f };				// Light Position
-//GLfloat Position2[]= { 30, -30, 0, 1.0f };			// Light Position
-GLfloat Position[]= { 0.0f, 3.0f, 0.0f, 1.0f };				// Light Position
+GLfloat Diffuse[]= { 0.5, 0.5, 0.5, 1.0f };				// Diffuse Light Values
+GLfloat Specular[] = { 0.0, 0.0, 0.0, 1.0 };				// Specular Light Values
+//GLfloat Position[]= { 0, 0, 10, 1.0f };				// Light Position
+//GLfloat Position2[]= { 0, 0, 0, 1.0f };			// Light Position
+GLfloat Position[]= { 0.0f, 3.0f, 3.0f, 1.0f };				// Light Position
 GLfloat Position2[]= { 0.0f, -5.0f, 0.0f, 1.0f };			// Light Position
 
 
@@ -31,6 +32,10 @@ CCamera camaraUsuario;
 
 //	Objeto para realizar figuras
 CFiguras figures;
+
+//	Objeto para modelos 3ds
+CModel clavo;
+CModel escudo;
 
 //	Texturas
 CTexture fondo;
@@ -52,25 +57,32 @@ GLfloat ruby_specular[] = {0.727811,	0.626959,	0.626959, 1.0};
 GLfloat ruby_shininess = 0.6;
 
 //	temp
+float xx = 0.f;
 float yy = 0.f;
+float zz = 0.f;
+float zzz = 0.f;
 
 void InitGL ( GLvoid )     // Inicializamos parametros
 {
 	glClearColor(0.5f, 0.5f, 0.8f, 0.0f);				// Azul de fondo	
 
-	//glEnable(GL_LIGHTING);
-	//glEnable(GL_LIGHT0);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
 	glEnable(GL_TEXTURE_2D);
 
-	//glShadeModel (GL_SMOOTH);
+	glShadeModel (GL_SMOOTH);
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, Diffuse);
+	//glLightfv(GL_LIGHT0, GL_AMBIENT, Diffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, Specular);
 	glLightfv(GL_LIGHT0, GL_POSITION, Position);
-	//glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, Position2);
+	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, Position2);
 	
 
 	glClearDepth(1.0f);									// Configuramos Depth Buffer
 	glEnable(GL_DEPTH_TEST);							// Habilitamos Depth Testing
 	glDepthFunc(GL_LEQUAL);								// Tipo de Depth Testing a realizar
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+
 
 	//	Procesar imagenes
 
@@ -89,6 +101,15 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	rojo.LoadTGA("textures/red.tga");
 	rojo.BuildGLTexture();
 	rojo.ReleaseImage();
+
+	//	Cargar modelos 3ds
+	clavo._3dsLoad("models/nail.3ds");
+	escudo._3dsLoad("models/shield.3ds");
+	//escudo.LoadTextureImages();
+	//escudo.GLIniTextures();
+	escudo.VertexNormals();
+	//escudo.ReleaseTextureImages();
+	escudo.FlipNormals();
 
 	//	Posición Cámara
 	camaraUsuario.Position_Camera(0, 0, 30, 0, 0, 27, 0, 1, 0);
@@ -120,18 +141,18 @@ void cajaPachinko()
 				glMaterialfv(GL_FRONT, GL_DIFFUSE, cromo_diffuse);
 				glMaterialfv(GL_FRONT, GL_SPECULAR, cromo_specular);
 				glMaterialf(GL_FRONT, GL_SHININESS, cromo_shininess * 128.0);
-				figures.cilindro(0.5, 5, 30, 0);
+				figures.cilindro(1, 5, 30, 0);
 			glPopMatrix();
-			figures.cilindro(0.5, 15, 30, 0);
+			figures.cilindro(1, 15, 30, 0);
 		glPopMatrix();
 
 		glPushMatrix();	//	Circunferencia
 			glTranslatef(0, 0, -2.5);
 			glRotatef(90, 1, 0, 0);
-			glMaterialfv(GL_FRONT, GL_AMBIENT, ruby_ambient);
-			glMaterialfv(GL_FRONT, GL_DIFFUSE, ruby_diffuse);
-			glMaterialfv(GL_FRONT, GL_SPECULAR, ruby_specular);
-			glMaterialf(GL_FRONT, GL_SHININESS, ruby_shininess * 128.0);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ruby_ambient);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, ruby_diffuse);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, ruby_specular);
+			glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, ruby_shininess * 128.0);
 			figures.cilindro(11, 5, 30, 0);
 		glPopMatrix();	//	Circunferencia
 
@@ -158,6 +179,147 @@ void cajaPachinko()
 	glPopMatrix();
 }
 
+void perro() {
+
+	glPushMatrix();
+
+	glTranslatef(-3, -1.75, 0);
+			glPushMatrix();
+				glScalef(6.0, 3.5, 1.0);
+				figures.prismaJerarquico(0, 0);	// A
+			glPopMatrix();
+
+			glPushMatrix();
+				glTranslatef(0.75, 0, 0);
+				glRotatef(0.0, 0.0, 0.0, 1.0);
+				glTranslatef(-0.75, -4.0, 0);
+				glScalef(1.5, 4, 1.0);
+				//glColor3f(1.0, 0.0, 0.0);
+				figures.prismaJerarquico(0, 0);		// E
+			glPopMatrix();
+
+			glPushMatrix();
+				glTranslatef(5.25, 0, 0);
+				glRotatef(0.0, 0.0, 0.0, 1.0);
+				glTranslatef(-0.75, -4.0, 0);
+				glScalef(1.5, 4, 1.0);
+				//glColor3f(1.0, 1.0, 0.0);
+				figures.prismaJerarquico(0, 0);		// F
+			glPopMatrix();
+
+
+			glPushMatrix();
+				glTranslatef(0, 3.25, 0);
+				glRotatef(0.0, 0, 0, 1);
+				glTranslatef(-3, -0.25, 0);
+				glScalef(3, 0.5, 1);
+				//glColor3f(0.0, 1.0, 0.0);
+				figures.prismaJerarquico(0, 0);		// G
+			glPopMatrix();
+
+			glPushMatrix();
+				glTranslatef(4, 3.5, 0);
+				glPushMatrix();
+					glScalef(2, 3, 1);
+					//glColor3f(0, 0, 1);
+					figures.prismaJerarquico(0, 0);	//B
+				glPopMatrix();
+
+				glPushMatrix();
+					glTranslatef(2, 0.5, 0);
+					glScalef(1.5, 0.5, 1);
+					//glColor3f(0, 1, 1);
+					figures.prismaJerarquico(0, 0);	//D
+				glPopMatrix();
+
+				glPushMatrix();
+					glTranslatef(0, 3, 0);
+					glScalef(0.5, 1.5, 1);
+					//glColor3f(1, 1, 1);
+					figures.prismaJerarquico(0, 0);	//C
+				glPopMatrix();
+			glPopMatrix();
+
+	glPopMatrix();
+}
+
+void obstaculos()
+{
+	glEnable(GL_COLOR_MATERIAL);
+	glColor3f(0, 1, 1);
+	for(int i = 0; i < 4; i++)
+	{ 
+		glPushMatrix();
+			glTranslatef(-8 + i * 2, 5, -2.99);
+			glRotatef(90, 1, 0, 0);
+			glScalef(2, 2, 2);
+			clavo.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+
+		glPushMatrix();
+			glTranslatef(8 - i * 2, 5, -2.99);
+			glRotatef(90, 1, 0, 0);
+			glScalef(2, 2, 2);
+			clavo.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+	}
+
+	for(int i = 0; i < 4; i++)
+	{ 
+		glPushMatrix();
+			glTranslatef(-8.5 + i * 2, 3.5, -2.99);
+			glRotatef(90, 1, 0, 0);
+			glScalef(2, 2, 2);
+			clavo.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+
+		glPushMatrix();
+			glTranslatef(8.5 - i * 2, 3.5, -2.99);
+			glRotatef(90, 1, 0, 0);
+			glScalef(2, 2, 2);
+			clavo.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+	}
+
+	for(int i = 0; i < 4; i++)
+	{ 
+		glPushMatrix();
+			glTranslatef(-8 + i * 2, 2, -2.99);
+			glRotatef(90, 1, 0, 0);
+			glScalef(2, 2, 2);
+			clavo.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+
+		glPushMatrix();
+			glTranslatef(8 - i * 2, 2, -2.99);
+			glRotatef(90, 1, 0, 0);
+			glScalef(2, 2, 2);
+			clavo.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+	}
+
+	glDisable(GL_COLOR_MATERIAL);
+	glColor3f(1, 1, 1);
+}
+
+void jackpots()
+{
+	//glDisable(GL_LIGHT0);
+	glColor3f(0.5, 0.5, 0.5);
+	glEnable(GL_COLOR_MATERIAL);
+	glPushMatrix();
+		
+		glTranslatef(0, 0, 0);
+		//glRotatef(90, 0, 1, 0);
+		glScalef(0.03, 0.03, 0.03);
+		escudo.GLrender(NULL, _SHADED, 1.0);
+
+	glPopMatrix();
+	glDisable(GL_COLOR_MATERIAL);
+	glColor3f(1, 1, 1);
+	//glEnable(GL_LIGHT0);
+}
+
 void display ( void )   // Creamos la funcion donde se dibuja
 {
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -171,7 +333,18 @@ void display ( void )   // Creamos la funcion donde se dibuja
 		camaraUsuario.mView.x, camaraUsuario.mView.y, camaraUsuario.mView.z,
 		camaraUsuario.mUp.x, camaraUsuario.mUp.y, camaraUsuario.mUp.z);
 		
+		glPushMatrix();
+			glTranslatef(xx, yy, zz);
+			figures.esfera(zzz, 30, 30, 0);
+
+		glPopMatrix();
+		
+		jackpots();
+		obstaculos();
+		perro();
 		cajaPachinko();
+
+		
 
 	glPopMatrix();	//	1
 
@@ -245,6 +418,34 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 
 		case 'P':
 			yy -= 0.1;
+			break;
+
+		case 'o':
+			xx += 0.1;
+			break;
+
+		case 'O':
+			xx -= 0.1;
+			break;
+
+		case 'i':
+			zz += 0.1;
+			break;
+
+		case 'I':
+			zz -= 0.1;
+			break;
+
+		case 'u':
+			zzz += 0.1;
+			break;
+
+		case 'U':
+			zzz -= 0.1;
+			break;
+
+		case 'l':
+			printf("(%f, %f, -2.99)\n", xx, yy);
 			break;
 
 		case 27:        // Cuando Esc es presionado...
