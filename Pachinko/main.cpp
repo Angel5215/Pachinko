@@ -18,8 +18,11 @@ float text_izq = 0.0;
 
 GLfloat Diffuse[]= { 0.5f, 0.5f, 0.5f, 1.0f };				// Diffuse Light Values
 GLfloat Specular[] = { 1.0, 1.0, 1.0, 1.0 };				// Specular Light Values
+//GLfloat Position[]= { -30, 30, 0, 1.0f };				// Light Position
+//GLfloat Position2[]= { 30, -30, 0, 1.0f };			// Light Position
 GLfloat Position[]= { 0.0f, 3.0f, 0.0f, 1.0f };				// Light Position
 GLfloat Position2[]= { 0.0f, -5.0f, 0.0f, 1.0f };			// Light Position
+
 
 //	Cámara para ver el tablero desde fuera
 float g_lookupdown = 0.0f;
@@ -33,16 +36,35 @@ CFiguras figures;
 CTexture fondo;
 CTexture pared;
 CTexture ventana;
+CTexture rojo;
+
+//	Material (cromeo) 
+//chrome	0.25	0.25	0.25	0.4	0.4	0.4	0.774597	0.774597	0.774597	0.6
+GLfloat cromo_ambient[] = {0.25, 0.25, 0.25, 1.0};
+GLfloat cromo_diffuse[] = {0.4, 0.4, 0.4, 1.0};
+GLfloat cromo_specular[] = {0.774597, 0.774597, 0.774597, 1.0};
+GLfloat cromo_shininess = 0.6;
+
+//	ruby 0.1745	0.01175	0.01175	0.61424	0.04136	0.04136	0.727811	0.626959	0.626959	0.6
+GLfloat ruby_ambient[] = {0.1745,	0.01175,	0.01175, 1.0};
+GLfloat ruby_diffuse[] = {0.61424,	0.04136,	0.04136, 1.0};
+GLfloat ruby_specular[] = {0.727811,	0.626959,	0.626959, 1.0};
+GLfloat ruby_shininess = 0.6;
+
+//	temp
+float yy = 0.f;
 
 void InitGL ( GLvoid )     // Inicializamos parametros
 {
 	glClearColor(0.5f, 0.5f, 0.8f, 0.0f);				// Azul de fondo	
 
+	//glEnable(GL_LIGHTING);
+	//glEnable(GL_LIGHT0);
 	glEnable(GL_TEXTURE_2D);
 
 	//glShadeModel (GL_SMOOTH);
 	glLightfv(GL_LIGHT0, GL_POSITION, Position);
-	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, Position2);
+	//glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, Position2);
 	
 
 	glClearDepth(1.0f);									// Configuramos Depth Buffer
@@ -64,6 +86,10 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	pared.BuildGLTexture();
 	pared.ReleaseImage();
 
+	rojo.LoadTGA("textures/red.tga");
+	rojo.BuildGLTexture();
+	rojo.ReleaseImage();
+
 	//	Posición Cámara
 	camaraUsuario.Position_Camera(0, 0, 30, 0, 0, 27, 0, 1, 0);
 }
@@ -84,10 +110,50 @@ void renderBitmapCharacter(float x, float y, float z, void *font,char *string)
 void cajaPachinko()
 {
 	glPushMatrix();
-	figures.prisma4(30, 30, 6, fondo.GLindex, pared.GLindex, ventana.GLindex);
 
-	glPushMatrix();
-	glPopMatrix();
+		glPushMatrix();
+			glTranslatef(-11.5, -15, 0);
+			glPushMatrix();
+				glTranslatef(-0.05, 14.6, 0);
+				glRotatef(25, 0, 0, -1);
+				glMaterialfv(GL_FRONT, GL_AMBIENT, cromo_ambient);
+				glMaterialfv(GL_FRONT, GL_DIFFUSE, cromo_diffuse);
+				glMaterialfv(GL_FRONT, GL_SPECULAR, cromo_specular);
+				glMaterialf(GL_FRONT, GL_SHININESS, cromo_shininess * 128.0);
+				figures.cilindro(0.5, 5, 30, 0);
+			glPopMatrix();
+			figures.cilindro(0.5, 15, 30, 0);
+		glPopMatrix();
+
+		glPushMatrix();	//	Circunferencia
+			glTranslatef(0, 0, -2.5);
+			glRotatef(90, 1, 0, 0);
+			glMaterialfv(GL_FRONT, GL_AMBIENT, ruby_ambient);
+			glMaterialfv(GL_FRONT, GL_DIFFUSE, ruby_diffuse);
+			glMaterialfv(GL_FRONT, GL_SPECULAR, ruby_specular);
+			glMaterialf(GL_FRONT, GL_SHININESS, ruby_shininess * 128.0);
+			figures.cilindro(11, 5, 30, 0);
+		glPopMatrix();	//	Circunferencia
+
+		glPushMatrix();	//	Bandeja
+			glTranslatef(-10, -14.5, 8.01);
+
+			glPushMatrix();	//	Botón
+				glTranslatef(6.01, 0, 0);
+				glRotatef(90, 0, 0, 1);
+				glEnable(GL_COLOR_MATERIAL);
+				glColor3f(0.4578, 0, 0);
+				figures.boton(1, 1, 10, 0);
+				glColor3f(1, 1, 1);
+				glDisable(GL_COLOR_MATERIAL);
+			glPopMatrix();	//	Botón
+
+
+
+			figures.bandeja(3.5, 10, 10, pared.GLindex);
+		glPopMatrix();	//	Bandeja
+
+		figures.prisma4(30, 30, 6, fondo.GLindex, pared.GLindex, ventana.GLindex);
 
 	glPopMatrix();
 }
@@ -171,6 +237,14 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 		case 'D':
 			camaraUsuario.Strafe_Camera(CAMERASPEED + 0.4);
 			//eye_camX += 0.5f;
+			break;
+
+		case 'p':
+			yy += 0.1;
+			break;
+
+		case 'P':
+			yy -= 0.1;
 			break;
 
 		case 27:        // Cuando Esc es presionado...
