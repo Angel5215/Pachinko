@@ -11,18 +11,25 @@
 #include "cmodel\CModel.h"
 #include <ctime>
 
+
 float pos_camX = 0, pos_camY = 0, pos_camZ = -5; 
 int eye_camX = 0, eye_camY = 0.0, eye_camZ = 0;
 
 float text_der = 1.0;
 float text_izq = 0.0;
 
+//Activacion de luces
+bool luz1 = true;
+bool luz2 = false;
+bool luz3 = false;
+bool luz4 = false;
+
 GLfloat Diffuse[]= { 0.5, 0.5, 0.5, 1.0f };				// Diffuse Light Values
-GLfloat Specular[] = { 0.0, 0.0, 0.0, 1.0 };				// Specular Light Values
-//GLfloat Position[]= { 0, 0, 10, 1.0f };				// Light Position
-//GLfloat Position2[]= { 0, 0, 0, 1.0f };			// Light Position
-GLfloat Position[]= { 0.0f, 3.0f, 3.0f, 1.0f };				// Light Position
-GLfloat Position2[]= { 0.0f, -5.0f, 0.0f, 1.0f };			// Light Position
+GLfloat Specular[] = { 0.15, 0.15, 0.15, 1.0 };				// Specular Light Values
+GLfloat Position[]= { -10, 10, 2, 1.0f };				// Light Position
+GLfloat Position2[]= { 0, 0, 0, 1.0f };			// Light Position
+//GLfloat Position[]= { 0.0f, 3.0f, 3.0f, 1.0f };				// Light Position
+//GLfloat Position2[]= { 0.0f, -5.0f, 0.0f, 1.0f };			// Light Position
 
 
 //	Cámara para ver el tablero desde fuera
@@ -56,6 +63,21 @@ GLfloat ruby_diffuse[] = {0.61424,	0.04136,	0.04136, 1.0};
 GLfloat ruby_specular[] = {0.727811,	0.626959,	0.626959, 1.0};
 GLfloat ruby_shininess = 0.6;
 
+//sapphire
+GLfloat sapphire_ambient[] = {0.0215,	0.1745,	0.0215, 1.0};
+GLfloat sapphire_diffuse[] = {0.07568,	0.61424, 0.07568, 1.0};
+GLfloat sapphire_specular[] = {0.633,	0.727811,	0.633, 1.0};
+GLfloat sapphire_shininess = 0.6;
+
+//gold 0.24725	0.1995	0.0745	0.75164	0.60648	0.22648	0.628281	
+//	0.555802	0.366065	0.4
+GLfloat gold_ambient[] = {0.05375,	0.05,	0.06625, 1.0};
+GLfloat gold_diffuse[] = {0.18275,	0.17,	0.22525, 1.0};
+GLfloat gold_specular[] = {0.332741,	0.328634,	0.346435, 1.0};
+GLfloat gold_shininess = 0.3;
+
+//		0.3
+
 //	temp
 float xx = 0.f;
 float yy = 0.f;
@@ -67,7 +89,7 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	glClearColor(0.5f, 0.5f, 0.8f, 0.0f);				// Azul de fondo	
 
 	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
+	//glEnable(GL_LIGHT0);
 	glEnable(GL_TEXTURE_2D);
 
 	glShadeModel (GL_SMOOTH);
@@ -75,7 +97,7 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	//glLightfv(GL_LIGHT0, GL_AMBIENT, Diffuse);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, Specular);
 	glLightfv(GL_LIGHT0, GL_POSITION, Position);
-	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, Position2);
+	//glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, Position2);
 	
 
 	glClearDepth(1.0f);									// Configuramos Depth Buffer
@@ -104,7 +126,11 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 
 	//	Cargar modelos 3ds
 	clavo._3dsLoad("models/nail.3ds");
-	escudo._3dsLoad("models/shield.3ds");
+	escudo._3dsLoad("models/escudo.3ds");
+	//COLOR plata = {0.5, 0.5, 0.5, 1.0};
+	//CMaterial *material = new CMaterial;
+	//material->SetDiffuse(plata);
+	//escudo.MaterialList.InsertFirst(material);
 	//escudo.LoadTextureImages();
 	//escudo.GLIniTextures();
 	escudo.VertexNormals();
@@ -132,18 +158,35 @@ void cajaPachinko()
 {
 	glPushMatrix();
 
+	if(luz1){
+		glEnable(GL_LIGHT0);
+	}
+	else {
+		glDisable(GL_LIGHT0);
+	}
+
+	glPushMatrix();
+	glEnable(GL_COLOR_MATERIAL);
+	glColor3f(1,1,1);
+	glTranslatef(Position[0],Position[1],Position[2]);
+	figures.esfera(1,20,20,0);
+	glDisable(GL_COLOR_MATERIAL);
+	glPopMatrix();
+
 		glPushMatrix();
 			glTranslatef(-11.5, -15, 0);
-			glPushMatrix();
+			glPushMatrix(); //canal
 				glTranslatef(-0.05, 14.6, 0);
 				glRotatef(25, 0, 0, -1);
 				glMaterialfv(GL_FRONT, GL_AMBIENT, cromo_ambient);
 				glMaterialfv(GL_FRONT, GL_DIFFUSE, cromo_diffuse);
 				glMaterialfv(GL_FRONT, GL_SPECULAR, cromo_specular);
 				glMaterialf(GL_FRONT, GL_SHININESS, cromo_shininess * 128.0);
-				figures.cilindro(1, 5, 30, 0);
+				glRotatef(180,0,1,0);
+				figures.canal(1, 5, 30, 0);
 			glPopMatrix();
-			figures.cilindro(1, 15, 30, 0);
+			glRotatef(180,0,1,0);
+			figures.canal(1, 15, 30, 0);
 		glPopMatrix();
 
 		glPushMatrix();	//	Circunferencia
@@ -153,14 +196,14 @@ void cajaPachinko()
 			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, ruby_diffuse);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, ruby_specular);
 			glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, ruby_shininess * 128.0);
-			figures.cilindro(11, 5, 30, 0);
+			figures.cilindro(11, 5, 80, 0);
 		glPopMatrix();	//	Circunferencia
 
 		glPushMatrix();	//	Bandeja
 			glTranslatef(-10, -14.5, 8.01);
 
 			glPushMatrix();	//	Botón
-				glTranslatef(6.01, 0, 0);
+				glTranslatef(25.9, 2.3, -6.6);
 				glRotatef(90, 0, 0, 1);
 				glEnable(GL_COLOR_MATERIAL);
 				glColor3f(0.4578, 0, 0);
@@ -179,11 +222,156 @@ void cajaPachinko()
 	glPopMatrix();
 }
 
+void corona()
+{
+	glPushMatrix();
+		glScalef(0.5, 0.5, 0.5);
+		glTranslatef(0, -5, 0);
+		glPushMatrix();
+			glScalef(4, 3, 3);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, gold_ambient);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, gold_diffuse);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, gold_specular);
+			glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, gold_shininess * 128.0);
+			figures.prisma2(0, 0);
+		glPopMatrix();
+
+
+		//	Parte delantera
+		glPushMatrix();
+			glTranslatef(0, 1.5, 1);
+			glPushMatrix();
+				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, gold_ambient);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, gold_diffuse);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, gold_specular);
+				glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, gold_shininess * 128.0);
+				figures.cono(2, 0.5, 5, 0);
+
+				glPushMatrix();
+					glTranslatef(0, 2.2, 0);
+					glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ruby_ambient);
+					glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, ruby_diffuse);
+					glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, ruby_specular);
+					glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, ruby_shininess * 128.0);
+					figures.esfera(0.25, 5, 5, 0);
+				glPopMatrix();
+			glPopMatrix();
+			
+			glPushMatrix();
+				glTranslatef(-1.75, 0, 0.25);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, gold_ambient);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, gold_diffuse);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, gold_specular);
+				glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, gold_shininess * 128.0);
+				figures.cono(1.5, 0.25, 5, 0);
+
+				glPushMatrix();
+					glTranslatef(0, 1.7, 0);
+					glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ruby_ambient);
+					glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, ruby_diffuse);
+					glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, ruby_specular);
+					glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, ruby_shininess * 128.0);
+					figures.esfera(0.25, 5, 5, 0);
+				glPopMatrix();
+
+			glPopMatrix();
+
+			glPushMatrix();
+				glTranslatef(1.75, 0, 0.25);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, gold_ambient);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, gold_diffuse);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, gold_specular);
+				glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, gold_shininess * 128.0);
+				figures.cono(1.5, 0.25, 5, 0);
+
+				glPushMatrix();
+					glTranslatef(0, 1.7, 0);
+					glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ruby_ambient);
+					glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, ruby_diffuse);
+					glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, ruby_specular);
+					glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, ruby_shininess * 128.0);
+					figures.esfera(0.25, 5, 5, 0);
+				glPopMatrix();
+
+			glPopMatrix();
+		glPopMatrix();
+
+
+		//	Parte trasera
+		glPushMatrix();
+			glTranslatef(0, 1.5, -1);
+			glPushMatrix();
+				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, gold_ambient);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, gold_diffuse);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, gold_specular);
+				glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, gold_shininess * 128.0);
+				figures.cono(2, 0.5, 5, 0);
+
+				glPushMatrix();
+					glTranslatef(0, 2.2, 0);
+					glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ruby_ambient);
+					glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, ruby_diffuse);
+					glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, ruby_specular);
+					glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, ruby_shininess * 128.0);
+					figures.esfera(0.25, 5, 5, 0);
+				glPopMatrix();
+
+			glPopMatrix();
+			
+			glPushMatrix();
+				glTranslatef(-1.75, 0, -0.25);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, gold_ambient);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, gold_diffuse);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, gold_specular);
+				glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, gold_shininess * 128.0);
+				figures.cono(1.5, 0.25, 5, 0);
+
+				glPushMatrix();
+					glTranslatef(0, 1.7, 0);
+					glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ruby_ambient);
+					glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, ruby_diffuse);
+					glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, ruby_specular);
+					glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, ruby_shininess * 128.0);
+					figures.esfera(0.25, 5, 5, 0);
+				glPopMatrix();
+
+			glPopMatrix();
+
+			glPushMatrix();
+				glTranslatef(1.75, 0, -0.25);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, gold_ambient);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, gold_diffuse);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, gold_specular);
+				glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, gold_shininess * 128.0);
+				figures.cono(1.5, 0.25, 5, 0);
+
+				glPushMatrix();
+					glTranslatef(0, 1.7, 0);
+					glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ruby_ambient);
+					glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, ruby_diffuse);
+					glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, ruby_specular);
+					glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, ruby_shininess * 128.0);
+					figures.esfera(0.25, 5, 5, 0);
+				glPopMatrix();
+
+			glPopMatrix();
+		glPopMatrix();
+
+
+
+	glPopMatrix();
+}
+
 void perro() {
 
 	glPushMatrix();
+	glScalef(0.5,0.5,0.5);
+	glTranslatef(-3, -2, -4.5);
 
-	glTranslatef(-3, -1.75, 0);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, sapphire_ambient);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, sapphire_diffuse);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, sapphire_specular);
+		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, sapphire_shininess * 128.0);
 			glPushMatrix();
 				glScalef(6.0, 3.5, 1.0);
 				figures.prismaJerarquico(0, 0);	// A
@@ -247,17 +435,34 @@ void obstaculos()
 {
 	glEnable(GL_COLOR_MATERIAL);
 	glColor3f(0, 1, 1);
-	for(int i = 0; i < 4; i++)
+	for(int i = 0; i < 6; i++)
 	{ 
 		glPushMatrix();
-			glTranslatef(-8 + i * 2, 5, -2.99);
+			glTranslatef(-11 + i * 1.7, 7.0, -4.51);
 			glRotatef(90, 1, 0, 0);
 			glScalef(2, 2, 2);
 			clavo.GLrender(NULL, _SHADED, 1.0);
 		glPopMatrix();
 
 		glPushMatrix();
-			glTranslatef(8 - i * 2, 5, -2.99);
+			glTranslatef(11 - i * 1.7, 7.0, -4.51);
+			glRotatef(90, 1, 0, 0);
+			glScalef(2, 2, 2);
+			clavo.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+	}
+
+	for(int i = 0; i < 5; i++)
+	{ 
+		glPushMatrix();
+			glTranslatef(-10+ i * 2, 5.5, -4.51);
+			glRotatef(90, 1, 0, 0);
+			glScalef(2, 2, 2);
+			clavo.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+
+		glPushMatrix();
+			glTranslatef(10 - i * 2, 5.5, -4.51);
 			glRotatef(90, 1, 0, 0);
 			glScalef(2, 2, 2);
 			clavo.GLrender(NULL, _SHADED, 1.0);
@@ -267,36 +472,55 @@ void obstaculos()
 	for(int i = 0; i < 4; i++)
 	{ 
 		glPushMatrix();
-			glTranslatef(-8.5 + i * 2, 3.5, -2.99);
+			glTranslatef(-11 + i * 2, 4.0, -4.51);
 			glRotatef(90, 1, 0, 0);
 			glScalef(2, 2, 2);
 			clavo.GLrender(NULL, _SHADED, 1.0);
 		glPopMatrix();
 
 		glPushMatrix();
-			glTranslatef(8.5 - i * 2, 3.5, -2.99);
+			glTranslatef(11 - i * 2, 4.0, -4.51);
 			glRotatef(90, 1, 0, 0);
 			glScalef(2, 2, 2);
 			clavo.GLrender(NULL, _SHADED, 1.0);
 		glPopMatrix();
 	}
+	//Tornillos centrales superiores
 
-	for(int i = 0; i < 4; i++)
-	{ 
+	for (int i = 0; i <= 15; i++){
+		const double PI = 3.1415926535897;
+		const double angulo = PI / (2 * 15);
+		const double radio = 3;
 		glPushMatrix();
-			glTranslatef(-8 + i * 2, 2, -2.99);
+			glTranslatef(-5 + radio * cos(i * angulo), 9 + radio * sin(i * angulo), -4.51);
 			glRotatef(90, 1, 0, 0);
 			glScalef(2, 2, 2);
 			clavo.GLrender(NULL, _SHADED, 1.0);
 		glPopMatrix();
 
 		glPushMatrix();
-			glTranslatef(8 - i * 2, 2, -2.99);
+			glTranslatef(5 + radio * cos(PI / 2 + i * angulo), 9 + radio * sin(PI / 2 + i * angulo), -4.51);
 			glRotatef(90, 1, 0, 0);
 			glScalef(2, 2, 2);
 			clavo.GLrender(NULL, _SHADED, 1.0);
 		glPopMatrix();
 	}
+	/*for(int i = 0, j = 0; i < 8, j < 8; i++, j++){ 
+		glPushMatrix();
+			//glTranslatef(-8 + i * 0.5, 12.0 - j * 0.5, -2.99);
+			glTranslatef(-5 + 3 * cos(i), )
+			glRotatef(90, 1, 0, 0);
+			glScalef(2, 2, 2);
+			clavo.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+
+		glPushMatrix();
+			//glTranslatef(8 - i * 0.5, 12.0 - j * 0.5, -2.99);
+			glRotatef(90, 1, 0, 0);
+			glScalef(2, 2, 2);
+			clavo.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+	}*/
 
 	glDisable(GL_COLOR_MATERIAL);
 	glColor3f(1, 1, 1);
@@ -305,17 +529,18 @@ void obstaculos()
 void jackpots()
 {
 	//glDisable(GL_LIGHT0);
-	glColor3f(0.5, 0.5, 0.5);
-	glEnable(GL_COLOR_MATERIAL);
+	glColor3f(1, 1, 0.5);
+	//glEnable(GL_COLOR_MATERIAL);
 	glPushMatrix();
 		
-		glTranslatef(0, 0, 0);
-		//glRotatef(90, 0, 1, 0);
-		glScalef(0.03, 0.03, 0.03);
-		escudo.GLrender(NULL, _SHADED, 1.0);
+		glTranslatef(-5, 0, 0);
+		glRotatef(75, 0, 1, 0);
+		//glScalef(0.03, 0.03, 0.03);
+		glScalef(0.25, 0.25, 0.25);
+		escudo.GLrender(&escudo.center, _SHADED, 1);
 
 	glPopMatrix();
-	glDisable(GL_COLOR_MATERIAL);
+	//glDisable(GL_COLOR_MATERIAL);
 	glColor3f(1, 1, 1);
 	//glEnable(GL_LIGHT0);
 }
@@ -342,7 +567,23 @@ void display ( void )   // Creamos la funcion donde se dibuja
 		jackpots();
 		obstaculos();
 		perro();
+		
+		
+		glPushMatrix();
+			glTranslatef(-15, 0, 0);
+			corona();
+			glTranslatef(5, 0, 0);
+			corona();
+			glTranslatef(5, 0, 0);
+			corona();
+			glTranslatef(5, 0, 0);
+			corona();
+		glPopMatrix();
+
+		glPushMatrix();
+		glScalef(1.5,1.5,1.5);
 		cajaPachinko();
+		glPopMatrix();
 
 		
 
@@ -428,6 +669,10 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 			xx -= 0.1;
 			break;
 
+		case '1':
+			luz1 = !luz1;
+			break;
+
 		case 'i':
 			zz += 0.1;
 			break;
@@ -445,7 +690,7 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 			break;
 
 		case 'l':
-			printf("(%f, %f, -2.99)\n", xx, yy);
+			printf("(%f, %f, %f)\n", xx, yy, zz);
 			break;
 
 		case 27:        // Cuando Esc es presionado...
