@@ -137,7 +137,7 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 
 	//	Cargar modelos 3ds
 	clavo._3dsLoad("models/nail.3ds");
-	escudo._3dsLoad("models/.3ds");
+	escudo._3dsLoad("models/escudo.3ds");
 	//COLOR plata = {0.5, 0.5, 0.5, 1.0};
 	//CMaterial *material = new CMaterial;
 	//material->SetDiffuse(plata);
@@ -187,9 +187,15 @@ void cajaPachinko()
 	glPopMatrix();
 
 		glPushMatrix();
-			glTranslatef(-11.5, -15, 0);
+			glTranslatef(-11.5, -5, 0);
+			glPushMatrix();
+			glRotatef(-130,0,0,1);
+			glRotatef(180,0,1,0);
+			figures.canal(1,7,30,0);
+			glPopMatrix();
+
 			glPushMatrix(); //canal
-				glTranslatef(-0.05, 14.6, 0);
+				glTranslatef(-0.05, 4.6, 0);
 				glRotatef(25, 0, 0, -1);
 				glMaterialfv(GL_FRONT, GL_AMBIENT, cromo_ambient);
 				glMaterialfv(GL_FRONT, GL_DIFFUSE, cromo_diffuse);
@@ -197,9 +203,11 @@ void cajaPachinko()
 				glMaterialf(GL_FRONT, GL_SHININESS, cromo_shininess * 128.0);
 				glRotatef(180,0,1,0);
 				figures.canal(1, 5, 30, 0);
-			glPopMatrix();
+			glPopMatrix(); // canal
 			glRotatef(180,0,1,0);
-			figures.canal(1, 15, 30, 0);
+			figures.canal(1, 5, 30, 0);
+
+			
 		glPopMatrix();
 
 		glPushMatrix();	//	Circunferencia
@@ -238,7 +246,7 @@ void cajaPachinko()
 void corona()
 {
 	glPushMatrix();
-		glScalef(0.5, 0.5, 0.5);
+		glScalef(0.7, 0.7, 0.7);
 		glTranslatef(0, -5, 0);
 		glPushMatrix();
 			glScalef(4, 3, 3);
@@ -378,7 +386,7 @@ void corona()
 void perro() {
 
 	glPushMatrix();
-	glScalef(0.5,0.5,0.5);
+	glScalef(0.65,0.65,0.65);
 	glTranslatef(-3, -2, -4.5);
 
 		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, sapphire_ambient);
@@ -498,6 +506,26 @@ void obstaculos()
 			clavo.GLrender(NULL, _SHADED, 1.0);
 		glPopMatrix();
 	}
+
+	for(int i = 0; i < 3; i++)
+	{ 
+		glPushMatrix();
+		glTranslatef(-8 + i * 2, 2.5, -4.51);
+		glRotatef(90, 1, 0, 0);
+		glScalef(2, 2, 2);
+		clavo.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(8 - i * 2, 2.5, -4.51);
+		glRotatef(90, 1, 0, 0);
+		glScalef(2, 2, 2);
+		clavo.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+	}
+
+	
+
 	//Tornillos centrales superiores
 
 	for (int i = 0; i <= 15; i++){
@@ -535,6 +563,132 @@ void obstaculos()
 		glPopMatrix();
 	}*/
 
+	//Tornillos jackpot (izq)
+	for(int i = 0, j = 0; i < 8, j < 8; i++, j++){ 
+		glPushMatrix();
+		glTranslatef(-15.0 + i * 0.2, 0.9 -j * 0.2, -4.51);
+		glRotatef(90, 1, 0, 0);
+		glScalef(2, 2, 2);
+		clavo.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(15.0 - i * 0.2, 0.9 -j * 0.2, -4.51);
+		glRotatef(90, 1, 0, 0);
+		glScalef(2, 2, 2);
+		clavo.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+	}
+	//Tornillos jackpot (der)
+	for(int i = 0, j = 0; i < 8, j < 8; i++, j++){ 
+		glPushMatrix();
+		glTranslatef(-10.0 - i * 0.2, 0.9 -j * 0.2, -4.51);
+		glRotatef(90, 1, 0, 0);
+		glScalef(2, 2, 2);
+		clavo.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(10.0 + i * 0.2, 0.9 -j * 0.2, -4.51);
+		glRotatef(90, 1, 0, 0);
+		glScalef(2, 2, 2);
+		clavo.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+	}
+
+	//Tornillos para coronas  inferiores.
+	for(int i = 0; i < 5; i++)
+	{ 
+		glPushMatrix();
+		glTranslatef(-13.5 + i * 2, -5.8, -4.51);
+		glRotatef(90, 1, 0, 0);
+		glScalef(2, 2, 2);
+		clavo.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(13.5 - i * 2, -5.8, -4.51);
+		glRotatef(90, 1, 0, 0);
+		glScalef(2, 2, 2);
+		clavo.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+	}
+
+	for(int i = 0; i < 5; i++)
+	{ 
+		glPushMatrix();
+		glTranslatef(-14.5 + i * 2, -7.3, -4.51);
+		glRotatef(90, 1, 0, 0);
+		glScalef(2, 2, 2);
+		clavo.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(14.5 - i * 2, -7.3, -4.51);
+		glRotatef(90, 1, 0, 0);
+		glScalef(2, 2, 2);
+		clavo.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+	}
+
+	for(int i = 0; i < 5; i++)
+	{ 
+		glPushMatrix();
+		glTranslatef(-13.5 + i * 2, -8.8, -4.51);
+		glRotatef(90, 1, 0, 0);
+		glScalef(2, 2, 2);
+		clavo.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(13.5 - i * 2, -8.8, -4.51);
+		glRotatef(90, 1, 0, 0);
+		glScalef(2, 2, 2);
+		clavo.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+	}
+
+	//Tornillo de pruebas
+	/*glPushMatrix();
+	glTranslatef(xx,yy,-4.51);
+	glRotatef(90, 1, 0, 0);
+	glScalef(2, 2, 2);
+	clavo.GLrender(NULL, _SHADED, 1.0);
+	glPopMatrix();*/
+
+
+	//Tornillos verticales
+	for(int i = 0; i < 8; i++)
+	{ 
+		glPushMatrix();
+		glTranslatef(-2.5, -4.8 - i * 0.5, -4.51);
+		glRotatef(90, 1, 0, 0);
+		glScalef(2, 2, 2);
+		clavo.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(2.5, -4.8 - i * 0.5, -4.51);
+		glRotatef(90, 1, 0, 0);
+		glScalef(2, 2, 2);
+		clavo.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-0.5, -4.8 - i * 0.5, -4.51);
+		glRotatef(90, 1, 0, 0);
+		glScalef(2, 2, 2);
+		clavo.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(0.5, -4.8 - i * 0.5, -4.51);
+		glRotatef(90, 1, 0, 0);
+		glScalef(2, 2, 2);
+		clavo.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+	}
+
 	glDisable(GL_COLOR_MATERIAL);
 	glColor3f(1, 1, 1);
 }
@@ -546,16 +700,51 @@ void jackpots()
 	glEnable(GL_COLOR_MATERIAL);
 	glPushMatrix();
 		
-		glTranslatef(-5, 0, 0);
+		glTranslatef(-12.5,-3.1,-3.6);
 		glRotatef(75, 0, 1, 0);
 		//glScalef(0.03, 0.03, 0.03);
-		glScalef(0.25, 0.25, 0.25);
-		escudo.GLrender(&escudo.center, _WIRED, 1);
+		glScalef(0.3, 0.3, 0.3);
+		escudo.GLrender(&escudo.center, _SHADED, 1);
 
 	glPopMatrix();
+
+	glPushMatrix();
+
+	glTranslatef(12.5,-3.1,-3.6);
+	glRotatef(75, 0, 1, 0);
+	//glScalef(0.03, 0.03, 0.03);
+	glScalef(0.3, 0.3, 0.3);
+	escudo.GLrender(&escudo.center, _SHADED, 1);
+
+	glPopMatrix();
+
 	glDisable(GL_COLOR_MATERIAL);
 	glColor3f(1, 1, 1);
 	//glEnable(GL_LIGHT0);
+}
+
+void entradas(){
+
+	glPushMatrix();
+	glTranslatef(-7,1.1,-3.1);
+	corona();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(7,1.1,-3.1);
+	corona();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(-7.1,-9,-3.1);
+	corona();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(7.1,-9,-3.1);
+	corona();
+	glPopMatrix();
+
 }
 
 void display ( void )   // Creamos la funcion donde se dibuja
@@ -602,17 +791,7 @@ void display ( void )   // Creamos la funcion donde se dibuja
 		obstaculos();
 		perro();
 		
-		
-		glPushMatrix();
-			glTranslatef(-15, 0, 0);
-			corona();
-			glTranslatef(5, 0, 0);
-			corona();
-			glTranslatef(5, 0, 0);
-			corona();
-			glTranslatef(5, 0, 0);
-			corona();
-		glPopMatrix();
+		entradas();
 
 		glPushMatrix();
 		glScalef(1.5,1.5,1.5);
