@@ -12,8 +12,10 @@
 #include <ctime>
 
 
-float pos_camX = 0, pos_camY = 0, pos_camZ = -5; 
-int eye_camX = 0, eye_camY = 0.0, eye_camZ = 0;
+//float pos_camX = 0, pos_camY = 0, pos_camZ = -5; 
+//int eye_camX = 0, eye_camY = 0.0, eye_camZ = 0;
+
+
 
 float text_der = 1.0;
 float text_izq = 0.0;
@@ -35,6 +37,15 @@ GLfloat Position2[]= { 0, 0, 0, 1.0f };			// Light Position
 //	Cámara para ver el tablero desde fuera
 float g_lookupdown = 0.0f;
 CCamera camaraUsuario;
+
+//	Posición de la canica metálica y su cámara
+CCamera camaraCanica;
+float c_posX = 0.f;
+float c_posY = 0.f;
+float c_posZ = 0.f;
+float c_lookupdown = 0.f;
+float c_lookrightleft = 0.f;
+bool isBallCameraEnabled = false;
 
 
 //	Objeto para realizar figuras
@@ -71,10 +82,10 @@ GLfloat sapphire_shininess = 0.6;
 
 //gold 0.24725	0.1995	0.0745	0.75164	0.60648	0.22648	0.628281	
 //	0.555802	0.366065	0.4
-GLfloat gold_ambient[] = {0.05375,	0.05,	0.06625, 1.0};
-GLfloat gold_diffuse[] = {0.18275,	0.17,	0.22525, 1.0};
-GLfloat gold_specular[] = {0.332741,	0.328634,	0.346435, 1.0};
-GLfloat gold_shininess = 0.3;
+GLfloat gold_ambient[] = {0.0215,	0.1745,	0.0215, 1.0};//{0.05375,	0.05,	0.06625, 1.0};
+GLfloat gold_diffuse[] = {0.07568,	0.61424, 0.07568, 1.0};//{0.18275,	0.17,	0.22525, 1.0};
+GLfloat gold_specular[] = {0.633,	0.727811,	0.633, 1.0};//{0.332741,	0.328634,	0.346435, 1.0};
+GLfloat gold_shininess = 0.6;
 
 //		0.3
 
@@ -126,7 +137,7 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 
 	//	Cargar modelos 3ds
 	clavo._3dsLoad("models/nail.3ds");
-	escudo._3dsLoad("models/escudo.3ds");
+	escudo._3dsLoad("models/.3ds");
 	//COLOR plata = {0.5, 0.5, 0.5, 1.0};
 	//CMaterial *material = new CMaterial;
 	//material->SetDiffuse(plata);
@@ -139,6 +150,8 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 
 	//	Posición Cámara
 	camaraUsuario.Position_Camera(0, 0, 30, 0, 0, 27, 0, 1, 0);
+	camaraCanica.Position_Camera(c_posX + 2.5, c_posY + 2.5, c_posZ,
+								c_posX, c_posY, c_posZ, 0, 1, 0);
 }
 
 
@@ -530,17 +543,17 @@ void jackpots()
 {
 	//glDisable(GL_LIGHT0);
 	glColor3f(1, 1, 0.5);
-	//glEnable(GL_COLOR_MATERIAL);
+	glEnable(GL_COLOR_MATERIAL);
 	glPushMatrix();
 		
 		glTranslatef(-5, 0, 0);
 		glRotatef(75, 0, 1, 0);
 		//glScalef(0.03, 0.03, 0.03);
 		glScalef(0.25, 0.25, 0.25);
-		escudo.GLrender(&escudo.center, _SHADED, 1);
+		escudo.GLrender(&escudo.center, _WIRED, 1);
 
 	glPopMatrix();
-	//glDisable(GL_COLOR_MATERIAL);
+	glDisable(GL_COLOR_MATERIAL);
 	glColor3f(1, 1, 1);
 	//glEnable(GL_LIGHT0);
 }
@@ -553,14 +566,35 @@ void display ( void )   // Creamos la funcion donde se dibuja
 
 	glPushMatrix();	//	1
 
-	glRotatef(g_lookupdown, 1, 0, 0);
-	gluLookAt(camaraUsuario.mPos.x, camaraUsuario.mPos.y, camaraUsuario.mPos.z,
-		camaraUsuario.mView.x, camaraUsuario.mView.y, camaraUsuario.mView.z,
-		camaraUsuario.mUp.x, camaraUsuario.mUp.y, camaraUsuario.mUp.z);
+	
+
+	if(isBallCameraEnabled)
+	{
+		//camaraCanica.Position_Camera(c_posX + 3, c_posY + 3, c_posZ,
+			//c_posX, c_posY, c_posZ, 0, 1, 0);
+
+		glRotatef(c_lookupdown, 1, 0, 0);
+		//glRotatef(c_lookrightleft, 0, 1, 0);		
+
+		gluLookAt(camaraCanica.mPos.x, camaraCanica.mPos.y, camaraCanica.mPos.z,
+			camaraCanica.mView.x, camaraCanica.mView.y, camaraCanica.mView.z,
+			camaraCanica.mUp.x, camaraCanica.mUp.y, camaraCanica.mUp.z);
+
+		/*gluLookAt(c_posX + 3, c_posY + 3, c_posZ, c_posX, c_posY, c_posZ,
+			camaraCanica.mUp.x, camaraCanica.mUp.y, camaraCanica.mUp.z);*/
+	}
+	else
+	{
+		glRotatef(g_lookupdown, 1, 0, 0);
+		
+		gluLookAt(camaraUsuario.mPos.x, camaraUsuario.mPos.y, camaraUsuario.mPos.z,
+			camaraUsuario.mView.x, camaraUsuario.mView.y, camaraUsuario.mView.z,
+			camaraUsuario.mUp.x, camaraUsuario.mUp.y, camaraUsuario.mUp.z);
+	}
 		
 		glPushMatrix();
-			glTranslatef(xx, yy, zz);
-			figures.esfera(zzz, 30, 30, 0);
+			glTranslatef(camaraCanica.mView.x, camaraCanica.mView.y, camaraCanica.mView.z);
+			figures.esfera(0.8, 20, 20, 0);  //canica con camara ligada
 
 		glPopMatrix();
 		
@@ -632,25 +666,61 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 	switch ( key ) {
 		case 'w':   //Movimientos de camara
 		case 'W':
-			camaraUsuario.Move_Camera(CAMERASPEED + 0.2);
+			if(isBallCameraEnabled)
+			{
+				//c_posX -= 0.3;
+				camaraCanica.Move_Camera(CAMERASPEED + 0.2);
+			}
+			else
+			{
+				camaraUsuario.Move_Camera(CAMERASPEED + 0.2);
+			}
 			//eye_camZ -= 0.5f;
 			break;
 
 		case 's':
 		case 'S':
-			camaraUsuario.Move_Camera(-(CAMERASPEED + 0.2));
+			if(isBallCameraEnabled)
+			{
+				//c_posX += 0.3;
+				camaraCanica.Move_Camera(-(CAMERASPEED + 0.2));
+			}
+			else
+			{
+				camaraUsuario.Move_Camera(-(CAMERASPEED + 0.2));
+			}
 			//eye_camZ += 0.5f;
 			break;
 
 		case 'a':
 		case 'A':
-			camaraUsuario.Strafe_Camera(-(CAMERASPEED + 0.4));
+			if(isBallCameraEnabled)
+			{
+				//c_posZ += 0.3;
+				camaraCanica.Strafe_Camera(-(CAMERASPEED + 0.4));
+			}
+			else
+			{
+				camaraUsuario.Strafe_Camera(-(CAMERASPEED + 0.4));
+			}
 			//eye_camX -= 0.5f;
 			break;
 		case 'd':
 		case 'D':
-			camaraUsuario.Strafe_Camera(CAMERASPEED + 0.4);
+			if(isBallCameraEnabled)
+			{
+				//c_posZ -= 0.3;
+				camaraCanica.Strafe_Camera(CAMERASPEED + 0.4);
+			}
+			else
+			{
+				camaraUsuario.Strafe_Camera(CAMERASPEED + 0.4);
+			}
 			//eye_camX += 0.5f;
+			break;
+
+		case '0':
+			isBallCameraEnabled = !isBallCameraEnabled;
 			break;
 
 		case 'p':
@@ -706,29 +776,78 @@ void arrow_keys ( int a_keys, int x, int y )  // Funcion para manejo de teclas e
 {
   switch ( a_keys ) {
 	case GLUT_KEY_PAGE_UP:
-		camaraUsuario.UpDown_Camera(CAMERASPEED);
+		if (isBallCameraEnabled)
+		{
+			//c_posY -= 0.3;
+			camaraCanica.UpDown_Camera(CAMERASPEED);
+		}
+		else
+		{
+			camaraUsuario.UpDown_Camera(CAMERASPEED);
+		}
 		//eye_camY += 0.5f;
 		break;
 
 	case GLUT_KEY_PAGE_DOWN:
-		camaraUsuario.UpDown_Camera(-CAMERASPEED);
+		if (isBallCameraEnabled)
+		{
+			//c_posY += 0.3;
+			camaraCanica.UpDown_Camera(-CAMERASPEED);
+		}
+		else
+		{
+			camaraUsuario.UpDown_Camera(-CAMERASPEED);
+		}
 		//eye_camY -= 0.5f;
 		break;
 
     case GLUT_KEY_UP:     // Presionamos tecla ARRIBA...
-		g_lookupdown -= 1.0f;
+		if (isBallCameraEnabled)
+		{
+			c_lookupdown -= 1.0f;
+		}
+		else
+		{
+			g_lookupdown -= 1.0f;
+		}
 		break;
 
     case GLUT_KEY_DOWN:               // Presionamos tecla ABAJO...
-		g_lookupdown += 1.0f;
+		if (isBallCameraEnabled)
+		{
+			c_lookupdown += 1.0f;
+		}
+		else
+		{
+			g_lookupdown += 1.0f;
+		}
+		//g_lookupdown += 1.0f;
 		break;
 
 	case GLUT_KEY_LEFT:
-		camaraUsuario.Rotate_View(-CAMERASPEED);
+		if (isBallCameraEnabled)
+		{
+			//c_lookrightleft -= 1.0f;
+			camaraCanica.Rotate_View(-CAMERASPEED);
+		}
+		else
+		{
+			camaraUsuario.Rotate_View(-CAMERASPEED);
+		}
+		//camaraUsuario.Rotate_View(-CAMERASPEED);
 		break;
 
 	case GLUT_KEY_RIGHT:
-		camaraUsuario.Rotate_View(CAMERASPEED);
+		if (isBallCameraEnabled)
+		{
+			//c_lookrightleft += 1.0f;
+			camaraCanica.Rotate_View(CAMERASPEED);
+		}
+		else
+		{
+			camaraUsuario.Rotate_View(CAMERASPEED);
+		}
+		//camaraUsuario.Rotate_View(CAMERASPEED);
 		break;
     default:
       break;
