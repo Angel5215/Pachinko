@@ -54,6 +54,7 @@ CFiguras figures;
 //	Objeto para modelos 3ds
 CModel clavo;
 CModel escudo;
+CModel cofre;
 
 //	Texturas
 CTexture fondo;
@@ -138,6 +139,7 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	//	Cargar modelos 3ds
 	clavo._3dsLoad("models/nail.3ds");
 	escudo._3dsLoad("models/escudo.3ds");
+	cofre._3dsLoad("models/chest.3ds");
 	//COLOR plata = {0.5, 0.5, 0.5, 1.0};
 	//CMaterial *material = new CMaterial;
 	//material->SetDiffuse(plata);
@@ -145,6 +147,7 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	//escudo.LoadTextureImages();
 	//escudo.GLIniTextures();
 	escudo.VertexNormals();
+	cofre.VertexNormals();
 	//escudo.ReleaseTextureImages();
 	escudo.FlipNormals();
 
@@ -661,28 +664,28 @@ void obstaculos()
 	for(int i = 0; i < 8; i++)
 	{ 
 		glPushMatrix();
-		glTranslatef(-2.5, -4.8 - i * 0.5, -4.51);
+		glTranslatef(-3.5, -4.8 - i * 0.5, -4.51);
 		glRotatef(90, 1, 0, 0);
 		glScalef(2, 2, 2);
 		clavo.GLrender(NULL, _SHADED, 1.0);
 		glPopMatrix();
 
 		glPushMatrix();
-		glTranslatef(2.5, -4.8 - i * 0.5, -4.51);
+		glTranslatef(3.5, -4.8 - i * 0.5, -4.51);
 		glRotatef(90, 1, 0, 0);
 		glScalef(2, 2, 2);
 		clavo.GLrender(NULL, _SHADED, 1.0);
 		glPopMatrix();
 
 		glPushMatrix();
-		glTranslatef(-0.5, -4.8 - i * 0.5, -4.51);
+		glTranslatef(-1.5, -4.8 - i * 0.5, -4.51);
 		glRotatef(90, 1, 0, 0);
 		glScalef(2, 2, 2);
 		clavo.GLrender(NULL, _SHADED, 1.0);
 		glPopMatrix();
 
 		glPushMatrix();
-		glTranslatef(0.5, -4.8 - i * 0.5, -4.51);
+		glTranslatef(1.5, -4.8 - i * 0.5, -4.51);
 		glRotatef(90, 1, 0, 0);
 		glScalef(2, 2, 2);
 		clavo.GLrender(NULL, _SHADED, 1.0);
@@ -716,6 +719,20 @@ void jackpots()
 	glScalef(0.3, 0.3, 0.3);
 	escudo.GLrender(&escudo.center, _SHADED, 1);
 
+	glPopMatrix();
+
+	glPushMatrix();
+		glTranslatef(-2.5, -12.7, -1.8);
+		glRotatef(90, 1, 0, 0);
+		glScalef(0.01, 0.01, 0.01);
+		cofre.GLrender(&cofre.center, _SHADED, 1);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(2.5, -12.7, -1.8);
+	glRotatef(90, 1, 0, 0);
+	glScalef(0.01, 0.01, 0.01);
+	cofre.GLrender(&cofre.center, _SHADED, 1);
 	glPopMatrix();
 
 	glDisable(GL_COLOR_MATERIAL);
