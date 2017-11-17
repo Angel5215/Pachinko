@@ -26,12 +26,18 @@ bool luz2 = false;
 bool luz3 = false;
 bool luz4 = false;
 
-GLfloat Diffuse[]= { 0.5, 0.5, 0.5, 1.0f };				// Diffuse Light Values
-GLfloat Specular[] = { 0.15, 0.15, 0.15, 1.0 };				// Specular Light Values
-GLfloat Position[]= { -10, 10, 2, 1.0f };				// Light Position
-GLfloat Position2[]= { 0, 0, 0, 1.0f };			// Light Position
-//GLfloat Position[]= { 0.0f, 3.0f, 3.0f, 1.0f };				// Light Position
+GLfloat Ambient[]= { 0.3, 0.3, 0.3, 1.0f };	
+GLfloat Diffuse[]= { 0.85, 0.85, 0.85, 1.0f };	// Diffuse Light Values
+GLfloat Specular[] = { 0.85, 0.85, 0.85, 1.0 };				// Specular Light Values
+GLfloat Position[]= { -10, 10, 2, 0.0f };				// Light Position
+//GLfloat Position2[]= { 0, 0, 0, 1.0f };			// Light Position
+//GLfloat Position[]= { 0.0f, 0.0f, 3.0f, 0.0f };				// Light Position
 //GLfloat Position2[]= { 0.0f, -5.0f, 0.0f, 1.0f };			// Light Position
+
+GLfloat Ambient2[]= { 0.2, 0.2, 0.2, 1.0f };	
+GLfloat Diffuse2[]= { 0.7, 0.7, 0.0, 1.0f };	// Diffuse Light Values
+GLfloat Specular2[] = { 0.7, 0.7, 0.7, 1.0 };				// Specular Light Values
+GLfloat Position2[]= { 0, 0, 5, 1.0f };				// Light Position
 
 
 //	Cámara para ver el tablero desde fuera
@@ -46,6 +52,11 @@ float c_posZ = 0.f;
 float c_lookupdown = 0.f;
 float c_lookrightleft = 0.f;
 bool isBallCameraEnabled = false;
+
+GLfloat Ambient3[]= { 0.2, 0.2, 0.2, 1.0f };	
+GLfloat Diffuse3[]= { 0.0, 0.0, 0.85, 1.0f };	// Diffuse Light Values
+GLfloat Specular3[] = { 0.85, 0.85, 0.85, 1.0 };				// Specular Light Values
+GLfloat Position3[]= { c_posX, c_posY, c_posZ, 1.0f };	
 
 
 //	Objeto para realizar figuras
@@ -100,17 +111,30 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 {
 	glClearColor(0.5f, 0.5f, 0.8f, 0.0f);				// Azul de fondo	
 
+	//glEnable(GL_CULL_FACE);
 	glEnable(GL_LIGHTING);
-	//glEnable(GL_LIGHT0);
+	glEnable(GL_NORMALIZE);
+	//glEnable(GL_LIGHT1);
 	glEnable(GL_TEXTURE_2D);
 
 	glShadeModel (GL_SMOOTH);
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, Diffuse);
-	//glLightfv(GL_LIGHT0, GL_AMBIENT, Diffuse);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, Specular);
-	glLightfv(GL_LIGHT0, GL_POSITION, Position);
-	//glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, Position2);
+	//glLightModelfv(GL_LIGHT_MODEL_AMBIENT, Diffuse);
+	glLightfv(GL_LIGHT1, GL_AMBIENT, Ambient);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, Diffuse);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, Specular);
+	glLightfv(GL_LIGHT1, GL_POSITION, Position);
+	//glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, Position2);
 	
+	glLightfv(GL_LIGHT2, GL_AMBIENT, Ambient2);
+	glLightfv(GL_LIGHT2, GL_DIFFUSE, Diffuse2);
+	glLightfv(GL_LIGHT2, GL_SPECULAR, Specular2);
+	glLightfv(GL_LIGHT2, GL_POSITION, Position2);
+
+	glLightfv(GL_LIGHT3, GL_AMBIENT, Ambient3);
+	glLightfv(GL_LIGHT3, GL_DIFFUSE, Diffuse3);
+	glLightfv(GL_LIGHT3, GL_SPECULAR, Specular3);
+	glLightfv(GL_LIGHT3, GL_POSITION, Position3);
+
 
 	glClearDepth(1.0f);									// Configuramos Depth Buffer
 	glEnable(GL_DEPTH_TEST);							// Habilitamos Depth Testing
@@ -149,7 +173,7 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	escudo.VertexNormals();
 	cofre.VertexNormals();
 	//escudo.ReleaseTextureImages();
-	escudo.FlipNormals();
+	//escudo.FlipNormals();
 
 	//	Posición Cámara
 	camaraUsuario.Position_Camera(0, 0, 30, 0, 0, 27, 0, 1, 0);
@@ -175,10 +199,31 @@ void cajaPachinko()
 	glPushMatrix();
 
 	if(luz1){
-		glEnable(GL_LIGHT0);
+		glEnable(GL_LIGHT1);
 	}
 	else {
-		glDisable(GL_LIGHT0);
+		glDisable(GL_LIGHT1);
+	}
+
+	if(luz2){
+		glEnable(GL_LIGHT2);
+	}
+	else {
+		glDisable(GL_LIGHT2);
+	}
+
+	if(luz3){
+		glEnable(GL_LIGHT3);
+	}
+	else {
+		glDisable(GL_LIGHT3);
+	}
+
+	if(luz4){
+		glEnable(GL_LIGHT4);
+	}
+	else {
+		glDisable(GL_LIGHT4);
 	}
 
 	glPushMatrix();
@@ -707,7 +752,7 @@ void jackpots()
 		glRotatef(75, 0, 1, 0);
 		//glScalef(0.03, 0.03, 0.03);
 		glScalef(0.3, 0.3, 0.3);
-		escudo.GLrender(&escudo.center, _SHADED, 1);
+		escudo.GLrender(NULL, _SHADED, 1);
 
 	glPopMatrix();
 
@@ -799,7 +844,13 @@ void display ( void )   // Creamos la funcion donde se dibuja
 	}
 		
 		glPushMatrix();
+			GLfloat PositionSpot3[] = {camaraCanica.mView.x, camaraCanica.mView.y, camaraCanica.mView.z};
+			Position3[0] = camaraCanica.mPos.x;
+			Position3[1] = camaraCanica.mPos.y;
+			Position3[2] = camaraCanica.mPos.z;
 			glTranslatef(camaraCanica.mView.x, camaraCanica.mView.y, camaraCanica.mView.z);
+			glLightfv(GL_LIGHT3,GL_POSITION, Position3);
+			glLightfv(GL_LIGHT3,GL_SPOT_DIRECTION,PositionSpot3);
 			figures.esfera(0.8, 20, 20, 0);  //canica con camara ligada
 
 		glPopMatrix();
@@ -937,6 +988,15 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 
 		case '1':
 			luz1 = !luz1;
+			break;
+		case '2':
+			luz2 = !luz2;
+			break;
+		case '3':
+			luz3 = !luz3;
+			break;
+		case '4':
+			luz4 = !luz4;
 			break;
 
 		case 'i':
