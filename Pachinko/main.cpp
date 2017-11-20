@@ -10,6 +10,12 @@
 #include "Camera.h"
 #include "cmodel\CModel.h"
 #include <ctime>
+#define _MAX_FRAMES_ 200
+
+//	Para la animación por keyframes
+struct Frame {
+	
+};
 
 
 //float pos_camX = 0, pos_camY = 0, pos_camZ = -5; 
@@ -38,6 +44,12 @@ GLfloat Ambient2[]= { 0.2, 0.2, 0.2, 1.0f };
 GLfloat Diffuse2[]= { 0.7, 0.7, 0.0, 1.0f };	// Diffuse Light Values
 GLfloat Specular2[] = { 0.7, 0.7, 0.7, 1.0 };				// Specular Light Values
 GLfloat Position2[]= { 0, 0, 5, 1.0f };				// Light Position
+
+//	Posición de la luz 4
+GLfloat Ambient4[]= { 0.23, 0.23, 0.23, 1.0f };	
+GLfloat Diffuse4[]= { 0.5, 0.f, 0.7, 1.0f };	// Diffuse Light Values
+GLfloat Specular4[] = { 0.7, 0.7, 0.7, 1.0 };				// Specular Light Values
+GLfloat Position4[]= { 0, 0, 0, 1.0f };				// Light Position
 
 
 //	Cámara para ver el tablero desde fuera
@@ -140,6 +152,12 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	glLightfv(GL_LIGHT3, GL_DIFFUSE, Diffuse3);
 	glLightfv(GL_LIGHT3, GL_SPECULAR, Specular3);
 	glLightfv(GL_LIGHT3, GL_POSITION, Position3);
+
+	//	Luz ligada a keyframes
+	glLightfv(GL_LIGHT4, GL_AMBIENT, Ambient4);
+	glLightfv(GL_LIGHT4, GL_DIFFUSE, Diffuse4);
+	glLightfv(GL_LIGHT4, GL_SPECULAR, Specular4);
+	glLightfv(GL_LIGHT4, GL_POSITION, Position4);
 
 
 	glClearDepth(1.0f);									// Configuramos Depth Buffer
@@ -769,10 +787,10 @@ void jackpots()
 	glRotatef(75, 0, 1, 0);
 	//glScalef(0.03, 0.03, 0.03);
 	glScalef(0.3, 0.3, 0.3);
-	escudo.GLrender(&escudo.center, _SHADED, 1);
+	escudo.GLrender(NULL, _SHADED, 1);
 
 	glPopMatrix();
-
+	glColor3f(0, 0, 1);
 	glPushMatrix();
 		glTranslatef(-2.5, -12.7, -1.8);
 		glRotatef(90, 1, 0, 0);
