@@ -278,12 +278,13 @@ void cajaPachinko()
 			glTranslatef(-10, -14.5, 8.01);
 
 			glPushMatrix();	//	Botón
-				//glTranslatef(25.9, 2.3, -6.6);
-				glTranslatef(18.3, 0.7, -5);
+				glTranslatef(24.9, 2.3, -6.6);
+				//glTranslatef(18.3, 0.7, -5);
+				glRotatef(90, 0, 1, 0);
 				glRotatef(90, 1, 0, 0);
 				glEnable(GL_COLOR_MATERIAL);
 				glColor3f(0.4578, 0, 0);
-				figures.boton(0.8, 1, 10, 0);
+				figures.boton(0.8, 2.5, 10, 0);
 				glColor3f(1, 1, 1);
 				glDisable(GL_COLOR_MATERIAL);
 			glPopMatrix();	//	Botón
