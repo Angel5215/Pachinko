@@ -99,6 +99,12 @@ GLfloat gold_diffuse[] = {0.07568,	0.61424, 0.07568, 1.0};//{0.18275,	0.17,	0.22
 GLfloat gold_specular[] = {0.633,	0.727811,	0.633, 1.0};//{0.332741,	0.328634,	0.346435, 1.0};
 GLfloat gold_shininess = 0.6;
 
+// Material plata
+GLfloat silver_ambient[] = {0.19225, 0.19225, 0.19225, 1.0};//{0.05375,	0.05,	0.06625, 1.0};
+GLfloat silver_diffuse[] = {0.50754, 0.50754, 0.50754, 1.0};//{0.18275,	0.17,	0.22525, 1.0};
+GLfloat silver_specular[] = {0.508273, 0.508273, 0.508273, 1.0};//{0.332741,	0.328634,	0.346435, 1.0};
+GLfloat silver_shininess = 0.4;
+
 //		0.3
 
 //	temp
@@ -844,14 +850,27 @@ void display ( void )   // Creamos la funcion donde se dibuja
 			camaraUsuario.mUp.x, camaraUsuario.mUp.y, camaraUsuario.mUp.z);
 	}
 		
+		//	Canica metálica que puede moverse con WASD
+		//	Para acceder a ella, apretar 0
 		glPushMatrix();
+			
+			//	Crear luz tipo Spotlight hacia donde ve la camara
 			GLfloat PositionSpot3[] = {camaraCanica.mView.x, camaraCanica.mView.y, camaraCanica.mView.z};
 			Position3[0] = camaraCanica.mPos.x;
 			Position3[1] = camaraCanica.mPos.y;
 			Position3[2] = camaraCanica.mPos.z;
+
+			//	Actualizar posición de la canica en tercera persona y la
+			//	dirección de la luz.
 			glTranslatef(camaraCanica.mView.x, camaraCanica.mView.y, camaraCanica.mView.z);
 			glLightfv(GL_LIGHT3,GL_POSITION, Position3);
 			glLightfv(GL_LIGHT3,GL_SPOT_DIRECTION,PositionSpot3);
+			
+			//	Agregar material metálico (plata)
+			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, silver_ambient);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, silver_diffuse);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, silver_specular);
+			glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, silver_shininess * 128.0);
 			figures.esfera(0.8, 20, 20, 0);  //canica con camara ligada
 
 		glPopMatrix();
