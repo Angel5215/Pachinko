@@ -9,19 +9,43 @@
 #include "figuras.h"
 #include "Camera.h"
 #include "cmodel\CModel.h"
-#include <ctime>
+//#include <ctime>
 #define _MAX_FRAMES_ 200
+
+//interpolaciones
+int i_max_steps = 10;
+int i_curr_steps = 0;
+
+//Keyframes
+float pataIzq=0.0;
+float pataDer=0.0;
+float cola=0.0;
+float incIzq=0.0;
+float incDer=0.0;
+float incCola=0.0;
 
 //	Para la animación por keyframes
 struct Frame {
-	
+	float pataIzq;
+	float pataDer;
+	float cola;
+	float incIzq;
+	float incDer;
+	float incCola;
 };
 
 
 //float pos_camX = 0, pos_camY = 0, pos_camZ = -5; 
 //int eye_camX = 0, eye_camY = 0.0, eye_camZ = 0;
 
+Frame KeyFrame[_MAX_FRAMES_];
+int FrameIndex = 1;			//introducir datos
+bool play = false;
+int playIndex = 0;
 
+int w = 500, h = 500;
+int frame = 0, time, timebase = 0;
+char s[30];
 
 float text_der = 1.0;
 float text_izq = 0.0;
@@ -58,12 +82,14 @@ CCamera camaraUsuario;
 
 //	Posición de la canica metálica y su cámara
 CCamera camaraCanica;
-float c_posX = 0.f;
-float c_posY = 0.f;
-float c_posZ = 0.f;
+float c_posX = 18.3;
+float c_posY = -20;
+float c_posZ = -1.5;
 float c_lookupdown = 0.f;
 float c_lookrightleft = 0.f;
 bool isBallCameraEnabled = false;
+
+//glTranslatef(18.3, 0.7, -5);
 
 GLfloat Ambient3[]= { 0.2, 0.2, 0.2, 1.0f };	
 GLfloat Diffuse3[]= { 0.0, 0.0, 0.85, 1.0f };	// Diffuse Light Values
@@ -198,6 +224,11 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	cofre.VertexNormals();
 	//escudo.ReleaseTextureImages();
 	//escudo.FlipNormals();
+
+	//Keyframes
+	KeyFrame[0].pataIzq = 0;
+	KeyFrame[0].pataDer = 0.0;
+	KeyFrame[0].cola = 0.0;
 
 	//	Posición Cámara
 	camaraUsuario.Position_Camera(0, 0, 30, 0, 0, 27, 0, 1, 0);
@@ -474,7 +505,7 @@ void perro() {
 
 			glPushMatrix();
 				glTranslatef(0.75, 0, 0);
-				glRotatef(0.0, 0.0, 0.0, 1.0);
+				glRotatef(pataIzq, 0.0, 0.0, 1.0);
 				glTranslatef(-0.75, -4.0, 0);
 				glScalef(1.5, 4, 1.0);
 				//glColor3f(1.0, 0.0, 0.0);
@@ -483,7 +514,7 @@ void perro() {
 
 			glPushMatrix();
 				glTranslatef(5.25, 0, 0);
-				glRotatef(0.0, 0.0, 0.0, 1.0);
+				glRotatef(pataDer, 0.0, 0.0, 1.0);
 				glTranslatef(-0.75, -4.0, 0);
 				glScalef(1.5, 4, 1.0);
 				//glColor3f(1.0, 1.0, 0.0);
@@ -493,7 +524,7 @@ void perro() {
 
 			glPushMatrix();
 				glTranslatef(0, 3.25, 0);
-				glRotatef(0.0, 0, 0, 1);
+				glRotatef(cola, 0, 0, 1);
 				glTranslatef(-3, -0.25, 0);
 				glScalef(3, 0.5, 1);
 				//glColor3f(0.0, 1.0, 0.0);
@@ -944,6 +975,51 @@ void animacion()
 	if(text_der<0)
 		text_der=1;
 
+	//Movimiento de la figura central
+	if (play)
+	{
+
+		if (i_curr_steps >= i_max_steps) //end of animation between frames?
+		{
+			playIndex++;
+			if (playIndex>FrameIndex - 2)	//end of total animation?
+			{
+				printf("termina anim\n");
+				playIndex = 0;
+				play = false;
+			}
+			else //Next frame interpolations
+			{
+				printf("Next frame interpolations\n");
+				i_curr_steps = 0; //Reset counter
+								  //Interpolation
+				KeyFrame[playIndex].incCola = (KeyFrame[playIndex + 1].cola - KeyFrame[playIndex].cola) / i_max_steps;		//100 frames
+				KeyFrame[playIndex].incIzq = (KeyFrame[playIndex + 1].pataIzq - KeyFrame[playIndex].pataIzq) / i_max_steps;		//100 frames
+				KeyFrame[playIndex].incDer = (KeyFrame[playIndex + 1].pataDer - KeyFrame[playIndex].pataDer) / i_max_steps;		//100 frames
+			
+			}
+		}
+		else
+		{	//Draw information
+			printf("Draw information");
+			cola += KeyFrame[playIndex].incCola;
+			pataDer += KeyFrame[playIndex].incDer;
+			pataIzq += KeyFrame[playIndex].incIzq;
+
+			i_curr_steps++;
+		}
+
+	}
+
+	frame++;
+	time = glutGet(GLUT_ELAPSED_TIME);
+	if (time - timebase > 1000) {
+		sprintf(s, "FPS:%4.2f", frame*1000.0 / (time - timebase));
+		timebase = time;
+		frame = 0;
+	}
+
+
 	glutPostRedisplay();
 }
 
@@ -955,7 +1031,8 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 			if(isBallCameraEnabled)
 			{
 				//c_posX -= 0.3;
-				camaraCanica.Move_Camera(CAMERASPEED + 0.2);
+				//camaraCanica.Move_Camera(CAMERASPEED + 0.2);
+				camaraCanica.UpDown_Camera(CAMERASPEED);
 			}
 			else
 			{
@@ -969,7 +1046,8 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 			if(isBallCameraEnabled)
 			{
 				//c_posX += 0.3;
-				camaraCanica.Move_Camera(-(CAMERASPEED + 0.2));
+				camaraCanica.UpDown_Camera(-CAMERASPEED);
+				//camaraCanica.Move_Camera(-(CAMERASPEED + 0.2));
 			}
 			else
 			{
@@ -1038,6 +1116,66 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 			luz4 = !luz4;
 			break;
 
+		case 'n':		//
+		case 'N':
+			if (FrameIndex<_MAX_FRAMES_)
+			{
+				printf("frameindex %d\n", FrameIndex);
+
+				KeyFrame[FrameIndex].cola = cola;
+				KeyFrame[FrameIndex].pataDer = pataDer;
+				KeyFrame[FrameIndex].pataIzq = pataIzq;
+
+				FrameIndex++;
+			}
+
+			break;
+
+		case 'm':
+		case 'M':
+			if (play == false && (FrameIndex>1))
+			{
+
+				cola = KeyFrame[0].cola;
+				pataIzq = KeyFrame[0].pataIzq;
+				pataDer = KeyFrame[0].pataDer;
+
+				//First Interpolation
+				KeyFrame[playIndex].incDer = (KeyFrame[playIndex + 1].pataDer - KeyFrame[playIndex].pataDer) / i_max_steps;		//100 frames
+				KeyFrame[playIndex].incIzq = (KeyFrame[playIndex + 1].pataIzq - KeyFrame[playIndex].pataIzq) / i_max_steps;		//100 frames
+				KeyFrame[playIndex].incCola = (KeyFrame[playIndex + 1].cola - KeyFrame[playIndex].cola) / i_max_steps;		//100 frames
+
+				play = true;
+				playIndex = 0;
+				i_curr_steps = 0;
+			}
+			else
+			{
+				play = false;
+			}
+			break;
+
+		case 'z':
+			cola += 20;
+			break;
+		case 'Z':
+			cola -= 20;
+			break;
+
+		case 'x':
+			pataIzq += 20;
+			break;
+		case 'X':
+			pataIzq -= 20;
+			break;
+
+		case 'c':
+			pataDer += 20;
+			break;
+		case 'C':
+			pataDer -= 20;
+			break;
+
 		case 'i':
 			zz += 0.1;
 			break;
@@ -1074,7 +1212,8 @@ void arrow_keys ( int a_keys, int x, int y )  // Funcion para manejo de teclas e
 		if (isBallCameraEnabled)
 		{
 			//c_posY -= 0.3;
-			camaraCanica.UpDown_Camera(CAMERASPEED);
+			//camaraCanica.UpDown_Camera(CAMERASPEED);
+			camaraCanica.Move_Camera(CAMERASPEED + 0.2);
 		}
 		else
 		{
@@ -1087,7 +1226,9 @@ void arrow_keys ( int a_keys, int x, int y )  // Funcion para manejo de teclas e
 		if (isBallCameraEnabled)
 		{
 			//c_posY += 0.3;
-			camaraCanica.UpDown_Camera(-CAMERASPEED);
+			
+			//camaraCanica.UpDown_Camera(-CAMERASPEED);
+			camaraCanica.Move_Camera(-(CAMERASPEED + 0.2));
 		}
 		else
 		{
