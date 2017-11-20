@@ -39,7 +39,7 @@ struct Frame {
 //int eye_camX = 0, eye_camY = 0.0, eye_camZ = 0;
 
 Frame KeyFrame[_MAX_FRAMES_];
-int FrameIndex = 1;			//introducir datos
+int FrameIndex = 9;			//introducir datos
 bool play = false;
 int playIndex = 0;
 
@@ -229,6 +229,38 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	KeyFrame[0].pataIzq = 0;
 	KeyFrame[0].pataDer = 0.0;
 	KeyFrame[0].cola = 0.0;
+
+	KeyFrame[1].pataIzq = -20;
+	KeyFrame[1].pataDer = 20;
+	KeyFrame[1].cola = 20;
+
+	KeyFrame[2].pataIzq = -40;
+	KeyFrame[2].pataDer = 40;
+	KeyFrame[2].cola = 40;
+
+	KeyFrame[3].pataIzq = -20;
+	KeyFrame[3].pataDer = 20;
+	KeyFrame[3].cola = 20;
+
+	KeyFrame[4].pataIzq = 0;
+	KeyFrame[4].pataDer = 0.0;
+	KeyFrame[4].cola = 0.0;
+
+	KeyFrame[5].pataIzq = 20;
+	KeyFrame[5].pataDer = -20;
+	KeyFrame[5].cola = -20;
+
+	KeyFrame[6].pataIzq = 0;
+	KeyFrame[6].pataDer = 0.0;
+	KeyFrame[6].cola = -40;
+
+	KeyFrame[7].pataIzq = -20;
+	KeyFrame[7].pataDer = 20;
+	KeyFrame[7].cola = -20;
+
+	KeyFrame[8].pataIzq = 0;
+	KeyFrame[8].pataDer = 0.0;
+	KeyFrame[8].cola = 0.0;
 
 	//	Posición Cámara
 	camaraUsuario.Position_Camera(0, 0, 30, 0, 0, 27, 0, 1, 0);
@@ -987,10 +1019,11 @@ void animacion()
 				printf("termina anim\n");
 				playIndex = 0;
 				play = false;
+				luz4 = false;
 			}
 			else //Next frame interpolations
 			{
-				printf("Next frame interpolations\n");
+				//printf("Next frame interpolations\n");
 				i_curr_steps = 0; //Reset counter
 								  //Interpolation
 				KeyFrame[playIndex].incCola = (KeyFrame[playIndex + 1].cola - KeyFrame[playIndex].cola) / i_max_steps;		//100 frames
@@ -1001,7 +1034,7 @@ void animacion()
 		}
 		else
 		{	//Draw information
-			printf("Draw information");
+			//printf("Draw information");
 			cola += KeyFrame[playIndex].incCola;
 			pataDer += KeyFrame[playIndex].incDer;
 			pataIzq += KeyFrame[playIndex].incIzq;
@@ -1135,7 +1168,7 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 		case 'M':
 			if (play == false && (FrameIndex>1))
 			{
-
+				luz4 = true;
 				cola = KeyFrame[0].cola;
 				pataIzq = KeyFrame[0].pataIzq;
 				pataDer = KeyFrame[0].pataDer;
@@ -1151,6 +1184,7 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 			}
 			else
 			{
+				//luz4 = false;
 				play = false;
 			}
 			break;
@@ -1194,6 +1228,11 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 
 		case 'l':
 			printf("(%f, %f, %f)\n", xx, yy, zz);
+			for (int i = 0; i < FrameIndex; i++) {
+				printf("pataIzq = %f\n", KeyFrame[i].pataIzq);
+				printf("pataDer = %f\n", KeyFrame[i].pataDer);
+				printf("cola = %f\n", KeyFrame[i].cola);
+			}
 			break;
 
 		case 27:        // Cuando Esc es presionado...
